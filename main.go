@@ -2,11 +2,15 @@ package main
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 type Board [9][9]int
 
-func isSafe(board Board, row, col, num int) bool {
+func isSafe(board *Board, row, col, num int) bool {
 	for i := 0; i < 9; i++ {
 		if board[row][i] == num || board[i][col] == num {
 			return false
@@ -25,24 +29,20 @@ func isSafe(board Board, row, col, num int) bool {
 	return true
 }
 
-func solveSudoku(board Board) bool {
-	empty := true
-	var row, col int
-
+func findEmpty(board *Board) (int, int, bool) {
 	for i := 0; i < 9; i++ {
 		for j := 0; j < 9; j++ {
 			if board[i][j] == 0 {
-				row, col = i, j
-				empty = false
-				break
+				return i, j, true
 			}
 		}
-		if !empty {
-			break
-		}
 	}
+	return 0, 0, false
+}
 
-	if empty {
+func solveSudoku(board *Board) bool {
+	row, col, ok := findEmpty(board)
+	if !ok {
 		return true
 	}
 
@@ -59,17 +59,38 @@ func solveSudoku(board Board) bool {
 	return false
 }
 
-func printBoard(board Board) {
+func printBoard(board *Board) {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+
+	color1 := text.Colors{text.BgCyan}
+	color2 := text.Colors{text.BgGreen}
+	colCfg := []table.ColumnConfig{}
 	for i := 0; i < 9; i++ {
+		row := make([]interface{}, 0)
 		for j := 0; j < 9; j++ {
-			fmt.Printf("%d ", board[i][j])
+			row = append(row, board[i][j])
 		}
-		fmt.Println()
+		if i >= 0 && i <= 2 {
+			t.AppendHeader(row)
+			colCfg = append(colCfg, table.ColumnConfig{Number: i + 1, Colors: color1, ColorsFooter: color2, ColorsHeader: color2})
+		} else if i >= 3 && i <= 5 {
+			t.AppendRow(row)
+			colCfg = append(colCfg, table.ColumnConfig{Number: i + 1, Colors: color2, ColorsFooter: color1, ColorsHeader: color1})
+		} else if i >= 6 && i <= 8 {
+			t.AppendFooter(row)
+			colCfg = append(colCfg, table.ColumnConfig{Number: i + 1, Colors: color1, ColorsFooter: color2, ColorsHeader: color2})
+		}
+
 	}
+
+	t.SetColumnConfigs(colCfg)
+	t.SetStyle(table.StyleColoredBright)
+	t.Render()
 }
 
 func main() {
-	board := Board{
+	board := &Board{
 		{5, 3, 0, 0, 7, 0, 0, 0, 0},
 		{6, 0, 0, 1, 9, 5, 0, 0, 0},
 		{0, 9, 8, 0, 0, 0, 0, 6, 0},
