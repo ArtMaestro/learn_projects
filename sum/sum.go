@@ -1,4 +1,4 @@
-package main
+package sum
 
 import "fmt"
 
@@ -16,7 +16,7 @@ func maestro(nums []int, target int) (int, int, bool) {
 	return 0, 0, false
 }
 
-func main() {
+func Sum() {
 	nums := []int{8, 1, 14, 22}
 	target := 0
 

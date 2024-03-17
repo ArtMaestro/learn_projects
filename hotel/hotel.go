@@ -1,4 +1,4 @@
-package main
+package hotel
 
 import (
 	"fmt"
@@ -32,7 +32,10 @@ func maxCapasity(guests []guest) int {
 	}
 
 	sort.Slice(events, func(i, j int) bool {
-		return events[i].time <= events[j].time
+		if events[i].time == events[j].time {
+			return !events[i].in
+		}
+		return events[i].time < events[j].time
 	})
 
 	for _, e := range events {
@@ -55,7 +58,7 @@ type Case struct {
 	expected int
 }
 
-func main() {
+func Hotel() {
 	cases := []Case{
 		{[]guest{}, 0},
 		{[]guest{{0, 1}, {1, 2}}, 1},
