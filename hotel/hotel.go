@@ -20,6 +20,35 @@ type event struct {
 	in   bool
 }
 
+func maxiCap(guests []guest) int {
+	maxGuests := 0
+	currentGuests := 0
+
+	gMap := make(map[int]int)
+
+	for _, guest := range guests {
+		gMap[guest.in] += 1
+		gMap[guest.out] -= 1
+	}
+
+	sortedGuests := make([]int, 0, len(gMap))
+	for g := range gMap {
+		sortedGuests = append(sortedGuests, g)
+	}
+
+	sort.Slice(sortedGuests, func(i, j int) bool {
+		return sortedGuests[i] < sortedGuests[j]
+	})
+
+	for _, g := range sortedGuests {
+		currentGuests += gMap[g]
+		if currentGuests > maxGuests {
+			maxGuests = currentGuests
+		}
+	}
+	return maxGuests
+}
+
 func maxCapasity(guests []guest) int {
 	maxGuests := 0
 	currentGuests := 0
